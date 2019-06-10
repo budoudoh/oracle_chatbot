@@ -1,0 +1,11 @@
+Hello, my name is Oracle. Here is all of the information I can provide you:
+
+	• Fortune - I can tell you your fortune. Just type "@Oracle /fortune" followed by your question about your future
+	
+	• Questions - I can answer questions for you. Just type "@Oracle /question" followed by what you would like to know
+	
+	• Images - I can find images for you. Just type "@Oracle /img" followed by the image you would like to find
+	
+	• Animated Gifs - I can find gifs for you as well. Just type "@Oracle /gif" followed by the gif you would like to find
+	
+I may have more features in the future when Basil gets off of his lazy ass and programs them, but this is it for now. Enjoy, gentlemen!
