@@ -1,2 +1,4 @@
 keys.js
 *.php
+node_modules/
+*.zip

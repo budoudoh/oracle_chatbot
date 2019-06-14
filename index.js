@@ -1,5 +1,5 @@
 console.log('Loading function');
-var oracle = require('functions.js');
+var oracle = require('./functions.js');
 
 /**
  * Oracle Chat bot
@@ -21,9 +21,10 @@ exports.handler = (event, context, callback) => {
 
         case 'POST':
             var data = JSON.parse(event.body);
-            var names = data.name.trim().explode();
+            var names = data.name.trim().split(" ");
             if (data.text.indexOf(botName) == 0 || data.text.indexOf(botNameLower) == 0){
                     var text = data.text.replace(botName, "").trim();
+                    text = text.replace(botNameLower, "").trim();
                     oracle(text, names[0]);
             }
             else
@@ -35,3 +36,5 @@ exports.handler = (event, context, callback) => {
             done(new Error(`Unsupported method "${event.httpMethod}"`));
     }
 };
+
+oracle("/stock msft /time intraday", "Basil");

@@ -7,5 +7,7 @@ Hello, my name is Oracle. Here is all of the information I can provide you:
 	• Images - I can find images for you. Just type "@Oracle /img" followed by the image you would like to find
 	
 	• Animated Gifs - I can find gifs for you as well. Just type "@Oracle /gif" followed by the gif you would like to find
+
+	• Stock Quotes - I can get the current quote for a stock as well as print a chart for a specified period of time. Just type "@Oracle /stock " followed by the symbol for the stock you want, as well as "/time " followed by the period of time. You can do "intraday", "X days", "X months", or "X years" for time options
 	
 I may have more features in the future when Basil gets off of his lazy ass and programs them, but this is it for now. Enjoy, gentlemen!

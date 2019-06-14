@@ -1,0 +1,23 @@
+{
+  "name": "oracle_bot",
+  "version": "1.0.0",
+  "description": "Groupme Chatbot",
+  "main": "index.js",
+  "dependencies": {
+    "fs": "^0.0.1-security",
+    "request": "^2.88.0",
+    "xmldom": "^0.1.27",
+    "xpath": "^0.0.27"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://budoudoh@bitbucket.org/budoudoh/oracle_chatbot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/budoudoh/oracle_chatbot#readme"
+}

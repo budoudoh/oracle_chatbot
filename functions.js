@@ -8,6 +8,9 @@ const customSearchUrl = "https://www.googleapis.com/customsearch/v1";
 const groupmeUrl = "https://api.groupme.com/v3/bots/post";
 const groupmeImageUrl = "https://image.groupme.com/pictures";
 const wolframURL = "http://api.wolframalpha.com/v2/query";
+const alphavantageURL = "https://www.alphavantage.co/query";
+const chartingURL = "https://charting.nasdaq.com/ext/charts.dll";
+
 
 const searchType = {
     image: "image",
@@ -47,9 +50,7 @@ function postMessageToGroupMe(text, type){
     });
 }
 
-function imagePostProcess(results){
-    var index = Math.floor(Math.random()*results.length);
-    var url = results[index].link;
+function imagePostProcess(url){
     var options = {
         method: 'GET',
         url: url,
@@ -143,13 +144,32 @@ function askWolframAlpha(query, callback){
     });
 }
 
-function oracle(text, name){
+function getStockQuote(symbol, callback){
+    var data = {
+        'function': "GLOBAL_QUOTE",
+        'symbol': symbol, 
+        'apikey': keys.alphavantage
+    }
+    request.get({url: alphavantageURL, qs: data}, callback);
+}
+
+function createQuoteMessage(stock){
+    var direction = "↑";
+    if(parseFloat(stock['09. change']) < 0){
+        direction = "↓";
+    }
+    return `${stock['01. symbol']} price: \$${parseFloat(stock['05. price']).toFixed(2)} change: ${parseFloat(stock['09. change']).toFixed(2)} ${direction} ${stock['10. change percent']}`;
+}
+module.exports = exports = function (text, name){
     if (text.indexOf("/gif") === 0){
         text = text.replace("/gif", "").trim();
         googleSearch(text, {type: "image", imgType: imgType.gif}, function(err, response, data) {
             data = JSON.parse(data);
             if(response.statusCode === 200 && data.items.length > 0){
-                imagePostProcess(data.items);
+                var results = data.items;
+                var index = Math.floor(Math.random()*results.length);
+                var url = results[index].link;
+                imagePostProcess(url);
             }
             else{
                 postMessageToGroupMe("I could not find a gif to match your request " + name, messageType.message);
@@ -166,7 +186,10 @@ function oracle(text, name){
         googleSearch(text, {type: "image", imgType: imgType.img}, function(err, response, data) {
             data = JSON.parse(data);
             if(response.statusCode === 200 && data.items.length > 0){
-                imagePostProcess(data.items);
+                var results = data.items;
+                var index = Math.floor(Math.random()*results.length);
+                var url = results[index].link;
+                imagePostProcess(url);
             }
             else{
                 postMessageToGroupMe("I could not find a gif to match your request " + name, messageType.message);
@@ -197,6 +220,44 @@ function oracle(text, name){
                     });
                 }
             });
+    }
+    else if(text.indexOf("/stock") === 0){
+        text = text.replace("/stock", "").trim();
+        var queries = text.split("/time");
+        var symbol = queries[0].trim();
+        getStockQuote(symbol, function(err, response, data) {
+            data = JSON.parse(data);
+            if(response.statusCode === 200 && data.hasOwnProperty("Global Quote")){
+                var quote  = createQuoteMessage(data["Global Quote"]);
+                postMessageToGroupMe(quote);
+                if(queries.length == 2){
+                    var time = queries[1].trim();
+                    var imageToken = "";
+                    if(time === "intraday"){
+                        imageToken = `2-1-17-0-0-009001631-03NA000000${symbol.toUpperCase()}&WD=635-HT=395-`;
+                    }
+                    else{
+                        time = time.split(" ");
+                        if(time.length == 2){
+                            if(time[1].toLowerCase() === "day" || time[1].toLowerCase() === "days"){
+                                imageToken = `2-1-14-0-0-7${time[0]}-03NA000000${symbol.toUpperCase()}-&SF:1|5-BG=FFFFFF-BT=0-HT=395-`;
+                            }
+                            else if(time[1].toLowerCase() === "month" || time[1].toLowerCase() === "months"){                        
+                                imageToken = `2-1-14-0-0-5${time[0]}-03NA000000${symbol.toUpperCase()}-&SF:1|5-BG=FFFFFF-BT=0-HT=395-`;
+                            }
+                            else if(time[1].toLowerCase() === "year" || time[1].toLowerCase() === "years"){                        
+                                imageToken = `2-1-14-0-0-5${parseInt(time[0])*12}-03NA000000${symbol.toUpperCase()}-&SF:1|5-BG=FFFFFF-BT=0-HT=395-`;
+                            }
+                        }   
+                    }
+                    imagePostProcess(`${chartingURL}?${imageToken}`);
+                }
+            }
+            else{
+                postMessageToGroupMe("I could not find a quote to match your stock symbol" + name, messageType.message);
+            }
+            
+        });
     }
     else if(text.indexOf("help") === 0){
         fs.readFile("help.txt", function (err, data) {
