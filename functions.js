@@ -30,13 +30,13 @@ const messageType = {
 function postMessageToGroupMe(text, type){
     var data = {
         bot_id: keys.botId
-    }
+    };
 
     if(type === messageType.image){
         data.picture_url = text;
     }
     else{
-        data.text = text
+        data.text = text;
     }
 
     var options = {
@@ -46,7 +46,13 @@ function postMessageToGroupMe(text, type){
     };
 
     request(options, function (error, response, body) {
-        console.log(response.statusCode);
+        if(response.statusCode <= 204){
+            console.log(response.statusCode);
+        }
+        else{
+            console.log(`Message post request failed with code ${response.statusCode} and message ${error}`);
+        }
+
     });
 }
 
@@ -73,10 +79,15 @@ function imagePostProcess(url){
                     data = JSON.parse(data);
                     postMessageToGroupMe(data.payload.picture_url, messageType.image);
                 }
+                else{
+                    console.log(`Image post request failed with code ${response.statusCode} and message ${err}`);
+                    postMessageToGroupMe("I could not fetch the image to match your request.", messageType.message);
+                }
             });
         }
         else{
-            postMessageToGroupMe("I could not find a gif to match your request ", messageType.message);
+            console.log(`Image fetch request failed with code ${response.statusCode} and message ${err}`);
+            postMessageToGroupMe("I could not fetch the image to match your request.", messageType.message);
         }
     });  
 }
@@ -113,7 +124,7 @@ function googleSearch(query, type, callback){
         'key': keys.apiKey,
         'cx': keys.cx, 
         'q': query
-    }
+    };
     if(type.type === searchType.image){
         data.searchType = "image";
         data.imgType = "photo";
@@ -139,6 +150,9 @@ function askWolframAlpha(query, callback){
             if(nodes.length > 0 && nodes[0].hasOwnProperty('childNodes')){
                 result = nodes[0].childNodes[0].data;    
             }
+        }
+        else{
+            console.log(`Wolfram Alpha request failed with code ${response.statusCode} and message ${err}`);
         }
         callback(result);
     });
@@ -172,6 +186,7 @@ module.exports = exports = function (text, name){
                 imagePostProcess(url);
             }
             else{
+                console.log(`Gif fetch request failed with code ${response.statusCode} and message ${err}`);
                 postMessageToGroupMe("I could not find a gif to match your request " + name, messageType.message);
             }
             
@@ -192,6 +207,7 @@ module.exports = exports = function (text, name){
                 imagePostProcess(url);
             }
             else{
+                console.log(`Image fetch request failed with code ${response.statusCode} and message ${err}`);
                 postMessageToGroupMe("I could not find a gif to match your request " + name, messageType.message);
             }
             
@@ -214,6 +230,7 @@ module.exports = exports = function (text, name){
                             postMessageToGroupMe(result, messageType.message);
                         }
                         else{
+                            console.log(`Google Search request failed with code ${response.statusCode} and message ${err}`);
                             postMessageToGroupMe("I could not find the answer to that question ".name, messageType.message);
                         }
                         
@@ -254,6 +271,7 @@ module.exports = exports = function (text, name){
                 }
             }
             else{
+                console.log(`Stock quote request failed with code ${response.statusCode} and message ${err}`);
                 postMessageToGroupMe("I could not find a quote to match your stock symbol" + name, messageType.message);
             }
             
@@ -261,7 +279,10 @@ module.exports = exports = function (text, name){
     }
     else if(text.indexOf("help") === 0){
         fs.readFile("help.txt", function (err, data) {
-            postMessageToGroupMe(data.toString(), messageType.message);
+            if (err) 
+                console.log(`Help file couldn't be opened: ${err}`);
+            else
+                postMessageToGroupMe(data.toString(), messageType.message);
         }); 
     }
 
