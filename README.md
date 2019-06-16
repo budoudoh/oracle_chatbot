@@ -3,20 +3,6 @@
 
 Oracle is a Groupme chatbot that provides extended functionality for your chat. Oracle can fetch images, answer questions, and check stock prices, all in your chat window. Oracle is written in JavaScript (Node 8.0)
 
-## Installation
-
-OS X & Linux:
-
-```sh
-npm install my-crazy-module --save
-```
-
-Windows:
-
-```sh
-edit autoexec.bat
-```
-
 ## Usage example
 
 * Fortune - Oracle can tell you your fortune. Just type "@Oracle /fortune" followed by your question about your future	
